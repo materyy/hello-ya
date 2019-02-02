@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+
+// 深度优先遍历实现走迷宫
+#define N 10
+
+// 遍历过的位置标记为4，墙标记为1，路标记为0，出口标记为3 
+int a[N][N] = {
+	{2,0,1,1,1,1,1,1,1,1},
+	{1,0,0,0,1,1,1,0,0,1},
+	{1,1,1,0,0,0,1,0,0,1},
+	{1,1,0,1,0,0,1,0,0,1},
+	{1,0,0,1,0,0,1,1,0,1},
+	{1,0,1,1,0,1,0,1,0,1},
+	{1,0,0,1,0,1,0,1,1,1},
+	{1,0,1,1,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,1},
+	{1,0,1,1,1,1,1,1,3,1}
+};
+typedef struct Pos {
+	int ios;
+	int jos;
+}pos_t;
+
+// 遍历时的四个方向，右， 下， 左， 上 
+pos_t pos[4] = { {0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+
+void show(int a[N][N])
+{
+	int i, j;
+	
+	system("cls");
+	for (i=0; i<N; i++) {
+		for (j=0; j<N; j++)
+			printf("%-2d", a[i][j]);
+		printf("\n");
+	}
+	Sleep(300);
+}
+
+void run(int x, int y)
+{
+	int i;
+	
+	if ( a[x][y] == 1 || a[x][y] == 4) // 碰到墙 或 走过 
+		return;
+	if ( a[x][y] == 3 ) { // 出口
+		show(a);
+		exit(0); 
+	} 
+	
+	a[x][y] = 4;
+	show(a);
+	for (i=0; i<4; i++) {
+		int nx = pos[i].ios + x;
+		int ny = pos[i].jos + y;
+		run(nx, ny);
+	}
+	
+}
+
+int main( void )
+{
+	show(a);
+	run(0, 0);
+	return 0;
+}
