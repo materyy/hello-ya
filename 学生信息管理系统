@@ -2,186 +2,240 @@
 #include<stdlib.h>
 #include<string.h>
 
-typedef struct studentnode    //学生信息结点
+typedef struct snode   //定义学生信息结构体
 {
-	char name[30];
+	char name[40];
 	char sex;
-	int grade[3];
+	int math;
+	int chinese;
+	int english;
 }Student;
 
-typedef struct node      //定义链表结点
+typedef struct node    //定义双向链表
 {
 	Student student;
 	struct node *left;
 	struct node *right;
-}node;
+}Node;
 
-void init();
-node *create();
-int newwtrite(node *head);
-void newlist(node *head);
-int insert(node *head,Student message);
-int deletestudent(node *head);
-int deletenode(node *head,char *name);
-void searchstudent(node *head);
-node *searchnode(node *head,char *name);
-void sort(node *head,int len);
-int length(node *head);
-int print(node *head);
-int save(node *head);
 
+void init(void);
+Node *createList();
+void  initialList(Node *head);
+int insertStudent(Node *head);
+void insertList(Node *head,Student data);
+int deleteStudent(Node *head);
+int deleteNode(Node *head,char *name);
+void searchStudent(Node *head);
+Node *searchNode(Node *head,char *name);
+void sortList(Node *head,int len);
+int lenList(Node *head);
+void printList(Node *head);
+int savetofile(Node *head);
+int modifyStudent(Node *head);
+int modifyNode(Node *head,char *name);
 
 
 //主函数
 int main()
 {
-	init();
-	puts("学生信息管理系统：");
-	puts("目前所有学生：");
-	node *head=create();
-	newlist(head);
+	//init();
+	printf("**********学生信息管理系统**********\n");
+	printf("            目前所有学生\n");
+	Node *head=createList();
+	initialList(head);
 	while(1)
 	{
-		int len=length(head);
-		sort(head,len);
+		int len=lenList(head);
+		sortList(head,len);
 		system("CLS");
-		puts("学生信息管理系统：");
-		puts("目前所有学生：");
-		print(head);
-		printf("1->添加\t2->删除\t3->查找4->保存5->退出\n");
+		printf("**********学生信息管理系统**********\n");
+		printf("            目前所有学生\n");
+		printList(head);
+		printf("1**添加  2**删除  3**查找  4**修改  5**保存  6**退出\n");
 		int select=0;
+		printf("请做出选择：");
 		scanf("%d",&select);
-		switch(select)
+		if(select>=1&&select<=6)
 		{
-		case 1:
-			newwtrite(head);
-			system("CLS");
-			puts("学生信息管理系统：");
-			puts("目前所有学生：");
-			print(head);
-			break;
-		case 2:
-			deletestudent(head);
-			system("CLS");
-			puts("学生信息管理系统：");
-			puts("目前所有学生：");
-			print(head);
-			break;
-		case 3:
-			searchstudent(head);
-			printf("按任意键返回主菜单\n");
-			getchar();
-			break;
-		case 4:
-			save(head);
-			printf("保存成功!\n");
-			system("CLS");
-			puts("学生信息管理系统：");
-			puts("目前所有学生：");
-			newlist(head);
-			print(head);
-			break;
-		case 5:
-			printf("程序即将退出！\n");
-			save(head);
-			printf("保存成功！\n");
-			exit(1);
+			switch(select)
+			{
+			case 1://添加
+				insertStudent(head);
+				system("CLS");
+				printf("**********学生信息管理系统**********\n");
+				printf("            目前所有学生\n");
+				printList(head);
+				break;
+			case 2://删除
+				deleteStudent(head);
+				system("CLS");
+				printf("**********学生信息管理系统**********\n");
+				printf("            目前所有学生\n");
+				printList(head);
+				break;
+			case 3://查找
+				searchStudent(head);
+				puts("按任意键返回主页面");
+				getchar();
+				getchar();
+				break;
+			case 4://修改
+				modifyStudent(head);
+				puts("修改函数成功运行！");
+				//system("CLS");
+				printf("**********学生信息管理系统**********\n");
+				printf("            目前所有学生\n");
+				printList(head);
+				break;
+			case 5://保存
+				savetofile(head);
+				//system("CLS");
+				printf("保存成功！\n");
+				getchar();
+				puts("按任意键返回主页面");
+				getchar();
+				printf("**********学生信息管理系统**********\n");
+				printf("            目前所有学生\n");
+				initialList(head);
+				printList(head);
+				break;
+			case 6://退出
+				puts("程序即将退出");
+				savetofile(head);
+				puts("保存成功");
+				exit(1);
+				break;
+			}
+		}
+		else 
+		{
+			puts("输入错误！");
 			break;
 		}
 	}
 	return 0;
 }
 
-//自定义函数
 
-//写入文件
-void init()
+//写入文件 初始化学生信息
+void init(void)
 {
-	FILE *fp=fopen("D:/啊啊啊实验室","w");
-	Student students[4]={{"haha",'g',99,98,97},{"lala",'g',87,89,88},{"xixi",'b',90,90,90},{"dixi",'g',97,96,70}};
-	fwrite(students,sizeof(Student),4,fp);
+	FILE *fp=fopen("文件绝对路径","w");
+	Student students[3]={{"haha",'g',77,88,99},{"lala",'b',90,99,98},{"dixi",'g',78,88,68}};
+	fwrite(students,sizeof(Student),3,fp);
 	fclose(fp);
 }
 
-//创建双向链表
-node *create()
+//创建一个带头节点的双向链表
+Node *createList()
 {
-	node *head=(node*)malloc(sizeof(node));
-	if(head)
+	Node *head=(Node*)malloc(sizeof(Node));
+	if(head!=NULL)
 	{
-		head->left=head;
-		head->right=head;
+		head->right=NULL;
+		head->left=NULL;
 		return head;
 	}
 	else 
+	{
+		puts("创建双链表失败！");
 		return NULL;
+	}
 }
 
+//初始化双链表
+void  initialList(Node *head)
+{
+	
+	FILE *fp=fopen("文件绝对路径","r");
+	Student newstudent;
+	while(fread(&newstudent,sizeof(Student),1,fp)!=0)
+	{
+		insertList(head,newstudent);
+	}
+}
 
-
-//功能
-int newwtrite(node *head)
+//插入功能调度
+int insertStudent(Node *head)
 {
 	Student newstudent;
-	puts("please input new student's message:");
-	printf("name:");
+	printf("请输入学生信息：\n");
+	printf("姓名：");
 	scanf("%s",newstudent.name);
-	printf("sex:");
-	scanf("%s",newstudent.sex);
-	printf("3 grades:\nChinese/Math/English:");
-	scanf("%d %d %d",&newstudent.grade[0],&newstudent.grade[1],&newstudent.grade[2]);
-	insert(head,newstudent);
-}
+	getchar();
+	printf("性别：");
+	scanf("%c",&newstudent.sex);
+	getchar();
+	printf("语文：");
+	scanf("%d",&newstudent.chinese);
+	printf("数学：");
+	scanf("%d",&newstudent.math);
+	printf("英语：");
+	scanf("%d",&newstudent.english);
 
-//插入
-int insert(node *head,Student message)
-{
-	node *newnode=(node *)malloc(sizeof(node));
-	if(newnode)
+	Node *newnode=(Node*)malloc(sizeof(Node));
+	if(newnode!=NULL)
 	{
-		newnode->student=message;
+		newnode->student=newstudent;
 		newnode->left=head;
 		newnode->right=head->right;
 		head->right=newnode;
-		newnode->right->left=newnode;
+		if(newnode->right==NULL)
+			head->left=newnode;
+		else
+			newnode->right->left=newnode;
+
 		return 1;
 	}
 	else 
 		return -1;
 }
 
-//初始化链表
-void newlist(node *head)
+//插入功能实现函数
+
+void insertList(Node *head,Student data)
 {
-	FILE *fop=fopen("D:/啊啊啊实验室/studentslist.txt","r");
-	Student newstudent;
-	while(fread(&newstudent,sizeof(Student),1,fop)!=0)
-		insert(head,newstudent);
+	Node *newnode=(Node*)malloc(sizeof(Node));
+	if(newnode!=NULL)
+	{
+		newnode->student=data;
+		newnode->left=head;
+		newnode->right=head->right;
+		head->right=newnode;
+		if(newnode->right==NULL)
+			head->left=newnode;
+		else
+			newnode->right->left=newnode;
+
+
+		//	newnode->right->left=newnode;
+	}
+
 }
 
-//删除*
-int deletestudent(node *head)
+//删除功能调度
+int deleteStudent(Node *head)
 {
-	printf("please input the name of the student who need to be deleted:");
-	char name[30];
+	printf("请输入需要删除的学生姓名：");
+	char name[40];
 	scanf("%s",name);
-	int thisname=deletenode(head,name);
-	if(thisname)
-		puts("success!");
-	else
-		puts("failure!");
-	return thisname;
+	int flag=deleteNode(head,name);
+	if(flag!=0)
+		puts("删除成功！");
+	else 
+		puts("删除失败！");
+	return flag;
 }
 
-//删除
-int deletenode(node *head,char *name)
+//删除功能实现函数
+int deleteNode(Node *head,char *name)
 {
-	node *searchstudent;
-		searchstudent=searchnode(head,name);
-	if(searchstudent)
+	Node *searchstudent=searchNode(head,name);
+	if(searchstudent!=NULL)
 	{
 		searchstudent->left->right=searchstudent->right;
-		searchstudent->right->left=searchstudeht->left;
+		searchstudent->right->left=searchstudent->left;
 		free(searchstudent);
 		return 1;
 	}
@@ -189,55 +243,53 @@ int deletenode(node *head,char *name)
 		return 0;
 }
 
-//查找*
-void searchstudent(node *head)
+//查找功能调度
+void searchStudent(Node *head)
 {
-	printf("plrase inpnut the name of the student who need to deleted:");
-	char name[30];
+	puts("请输入需要查找的学生姓名：");
+	char name[40];
 	scanf("%s",name);
-	node *thestudent=searchnode(head,name);
-	if(thestudent)
+	Node *result=searchNode(head,name);
+	if(result!=NULL)
 	{
 		printf("姓名\t性别\t语文\t数学\t英语\n");
-		printf("%s\t%c\t%d\t%d\t%d\n",thestudent->student.name,thestudent->student.sex,thestudent->student.grade[0],thestudnet->student.grade[1],thestudnet->student.grade[2]);
+		printf("%s\t%c\t%d\t%d\t%d\n",result->student.name,result->student.sex,result->student.chinese,result->student.math,result->student.english);
 	}
 	else
-		puts("can't find the student!");
+		puts("没有找到该学生！");
 }
 
-//查找
-node *searchnode(node *head,char *name)
+//查找功能实现函数   ********************
+Node *searchNode(Node *head,char *name)
 {
-	node *left=head;
-	node *right=head;
+	Node *thestudent=head;
 	do
 	{
-		left=left->left;
-		right=right->right;
-		if(strcmp(left->student.name,name)==0)
-			return left;
-		if(strcmp(right->student.name,name)==0)
-			return right;
-	}while(left!=right&&left->left!=right);
+		thestudent=thestudent->right;
+		if(strcmp(thestudent->student.name,name)==0)
+			return thestudent;
+	}
+	while(thestudent->right!=NULL);  //******
 	return NULL;
 }
 
-//排序
-void sort(node *head,int len)
+//根据姓名字符串排序函数
+void sortList(Node *head,int len)
 {
-	node *p,*q,*max,*tmp;
+	Node *p,*q,*max;
 	Student t;
 	p=head->right;
 	q=p->right;
 	int i=0,j=0;
 	for(i=0;i<len-1;i++)
 	{
-		if(p==head)  break;
+		if(p==NULL)
+			break;
 		max=p;
 		q=p;
-		for(j=i;j<len;j++)
+		for(j=0;j<len;j++)
 		{
-			if(q==head)
+			if(q==NULL)
 				break;
 			if(strcmp(max->student.name,q->student.name)>0)
 				max=q;
@@ -253,12 +305,12 @@ void sort(node *head,int len)
 	}
 }
 
-//长度
-int length(node *head)
+//求双向链表长度
+int lenList(Node *head)
 {
-	node *p=head;
+	Node *p=head;
 	int len=0;
-	while(p->right!=head)
+	while(p->right!=NULL)
 	{
 		len++;
 		p=p->right;
@@ -266,26 +318,58 @@ int length(node *head)
 	return len;
 }
 
-//print
-int print(node *head)
+//打印双链表内容
+void printList(Node *head)
 {
-	node *p=head->right;
-	while(p!=head)
+	Node *p=head->right;
+	printf("姓名\t性别\t语文\t数学\t英语\n");
+	while(p!=NULL)
 	{
-		printf("%s\t%c\t%d\t%d\t%d\n", p->student.name, p->student.sex,p->student.grade[0], p->student.grade[1], p->student.grade[2]);
+		printf("%s\t%c\t%d\t%d\t%d\n",p->student.name,p->student.sex,p->student.chinese,p->student.math,p->student.english);
 		p=p->right;
 	}
 }
 
-//更新文件中内容
-int save(node *head)
+//将学生信息写回students.txt文件  *保存*
+int savetofile(Node *head)
 {
-	FILE *fop=fopen("D:/啊啊啊实验室/student.txt","b");
-	node *p=head->right;
-	while(p!=head)
+	FILE *fp=fopen("文件绝对路径","w");
+	Node *p=head->right;
+	while(p!=NULL)
 	{
-		fwrite(&p->student,sizeof(Student),1,fop);
+		fwrite(&p->student,sizeof(Student),1,fp);
 		p=p->right;
 	}
 	return 1;
+}
+
+//修改功能调度
+int modifyStudent(Node *head)
+{
+	printf("请输入需要修改的学生姓名：");
+	char name[40];
+	scanf("%s",name);
+	getchar();
+	int thestudent=modifyNode(head,name);
+	if(thestudent)
+		printf("修改成功！\n");
+	else
+		puts("修改失败！");
+	return thestudent;
+}
+
+//修改功能的实现函数
+int modifyNode(Node *head,char *name)
+{
+	deleteNode(head,name);
+	if(insertStudent(head)==1)
+	{
+		puts("修改成功！");
+		return 1;
+	}
+	else
+	{
+		puts("修改失败！");
+		return 0;
+	}
 }
